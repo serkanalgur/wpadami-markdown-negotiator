@@ -1,19 +1,33 @@
 <?php
+/**
+ * Generator for AI Markdown.
+ *
+ * @package SA_AI_Markdown
+ */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Class SA_AI_Markdown_Generator
+ *
+ * Converts WordPress posts to Markdown with YAML frontmatter.
+ */
 class SA_AI_Markdown_Generator {
 
+
+	/**
+	 * Constructor.
+	 */
 	public function __construct() {
-		// Nothing to initialize here for now
+		// Nothing to initialize here for now.
 	}
 
 	/**
 	 * Convert post content and metadata to Markdown with YAML frontmatter.
 	 *
-	 * @param WP_Post $post The post object.
+	 * @param  WP_Post $post The post object.
 	 * @return string The Markdown content.
 	 */
 	public function generate_markdown( $post ) {
@@ -21,14 +35,14 @@ class SA_AI_Markdown_Generator {
 			return '';
 		}
 
-		$frontmatter = [
-			'title'     => $post->post_title,
-			'date'      => $post->post_date,
-			'author'    => get_the_author_meta( 'display_name', $post->post_author ),
-			'permalink' => get_permalink( $post->ID ),
-			'categories'=> wp_get_post_categories( $post->ID, [ 'fields' => 'names' ] ),
-			'tags'      => wp_get_post_tags( $post->ID, [ 'fields' => 'names' ] ),
-		];
+		$frontmatter = array(
+			'title'      => $post->post_title,
+			'date'       => $post->post_date,
+			'author'     => get_the_author_meta( 'display_name', $post->post_author ),
+			'permalink'  => get_permalink( $post->ID ),
+			'categories' => wp_get_post_categories( $post->ID, array( 'fields' => 'names' ) ),
+			'tags'       => wp_get_post_tags( $post->ID, array( 'fields' => 'names' ) ),
+		);
 
 		// Include featured image information if available
 		$thumbnail_url = '';
@@ -48,7 +62,7 @@ class SA_AI_Markdown_Generator {
 		}
 
 		if ( $thumbnail_url ) {
-			$frontmatter['featured_image'] = $thumbnail_url;
+			$frontmatter['featured_image']     = $thumbnail_url;
 			$frontmatter['featured_image_alt'] = $thumbnail_alt;
 		}
 
@@ -83,7 +97,7 @@ class SA_AI_Markdown_Generator {
 		$markdown = "---\n";
 		foreach ( $frontmatter as $key => $value ) {
 			if ( is_array( $value ) ) {
-				$markdown .= "$key: [" . implode( ', ', array_map( [ $this, 'quote' ], $value ) ) . "]\n";
+				$markdown .= "$key: [" . implode( ', ', array_map( array( $this, 'quote' ), $value ) ) . "]\n";
 			} else {
 				$markdown .= "$key: " . $this->quote( $value ) . "\n";
 			}
@@ -92,7 +106,7 @@ class SA_AI_Markdown_Generator {
 
 		// If a featured image was found, add it to the top of the Markdown body as an image
 		if ( ! empty( $frontmatter['featured_image'] ) ) {
-			$alt = isset( $frontmatter['featured_image_alt'] ) ? $frontmatter['featured_image_alt'] : '';
+			$alt       = isset( $frontmatter['featured_image_alt'] ) ? $frontmatter['featured_image_alt'] : '';
 			$markdown .= '![' . $this->quote( $alt ) . '](' . $frontmatter['featured_image'] . ")\n\n";
 		}
 
@@ -121,15 +135,15 @@ class SA_AI_Markdown_Generator {
 						$output .= wp_strip_all_tags( $block['innerHTML'] ) . "\n\n";
 						break;
 					case 'core/heading':
-						$level = isset( $block['attrs']['level'] ) ? $block['attrs']['level'] : 2;
+						$level   = isset( $block['attrs']['level'] ) ? $block['attrs']['level'] : 2;
 						$output .= str_repeat( '#', $level ) . ' ' . wp_strip_all_tags( $block['innerHTML'] ) . "\n\n";
 						break;
 					case 'core/list':
 						$output .= $this->convert_html_to_markdown( $block['innerHTML'] ) . "\n";
 						break;
 					case 'core/image':
-						$url = isset( $block['attrs']['url'] ) ? $block['attrs']['url'] : '';
-						$alt = isset( $block['attrs']['alt'] ) ? $block['attrs']['alt'] : '';
+						$url     = isset( $block['attrs']['url'] ) ? $block['attrs']['url'] : '';
+						$alt     = isset( $block['attrs']['alt'] ) ? $block['attrs']['alt'] : '';
 						$output .= "![$alt]($url)\n\n";
 						break;
 					case 'core/code':
@@ -155,11 +169,11 @@ class SA_AI_Markdown_Generator {
 
 		// Protect existing fenced code blocks (```...```) so they are not altered by tag stripping
 		$code_blocks = array();
-		$markdown = preg_replace_callback(
+		$markdown    = preg_replace_callback(
 			'/```([^\n\r]*)\n(.*?)\n```/s',
-			function ( $m ) use ( & $code_blocks ) {
-				$i = count( $code_blocks );
-				$code_blocks["__CB_{$i}__"] = "```" . $m[1] . "\n" . $m[2] . "\n```";
+			function ( $m ) use ( &$code_blocks ) {
+				$i                            = count( $code_blocks );
+				$code_blocks[ "__CB_{$i}__" ] = '```' . $m[1] . "\n" . $m[2] . "\n```";
 				return "__CB_{$i}__";
 			},
 			$markdown
@@ -168,10 +182,10 @@ class SA_AI_Markdown_Generator {
 		// Convert <pre><code>...</code></pre> and <pre>...</pre> to fenced code blocks
 		$markdown = preg_replace_callback(
 			'#<pre(?P<pre_attrs>[^>]*)>\s*(?:<code(?P<code_attrs>[^>]*)>)?(?P<code>.*?)(?:</code>)?\s*</pre>#is',
-			function ( $m ) use ( & $code_blocks ) {
-				$code = html_entity_decode( $m['code'] );
+			function ( $m ) use ( &$code_blocks ) {
+				$code  = html_entity_decode( $m['code'] );
 				$attrs = $m['code_attrs'] . ' ' . $m['pre_attrs'];
-				$lang = '';
+				$lang  = '';
 				if ( preg_match( '/class=["\']([^"\']+)["\']/', $attrs, $cm ) ) {
 					if ( preg_match( '/(?:language-|lang-)([a-z0-9+-]+)/i', $cm[1], $lm ) ) {
 						$lang = strtolower( $lm[1] );
@@ -180,7 +194,7 @@ class SA_AI_Markdown_Generator {
 
 				$code = rtrim( $code, "\n\r" );
 				// Determine longest run of backticks in code to choose a safe fence length
-				preg_match_all('/`+/', $code, $bt_matches);
+				preg_match_all( '/`+/', $code, $bt_matches );
 				$max_ticks = 0;
 				if ( ! empty( $bt_matches[0] ) ) {
 					foreach ( $bt_matches[0] as $run ) {
@@ -190,14 +204,14 @@ class SA_AI_Markdown_Generator {
 						}
 					}
 				}
-				$fence = str_repeat( '`', max(3, $max_ticks + 1) );
+				$fence = str_repeat( '`', max( 3, $max_ticks + 1 ) );
 				if ( $lang ) {
 					$block = $fence . $lang . "\n" . $code . "\n" . $fence . "\n\n";
 				} else {
 					$block = $fence . "\n" . $code . "\n" . $fence . "\n\n";
 				}
-				$i = count( $code_blocks );
-				$placeholder = "__CB_{$i}__";
+				$i                           = count( $code_blocks );
+				$placeholder                 = "__CB_{$i}__";
 				$code_blocks[ $placeholder ] = $block;
 				return $placeholder;
 			},

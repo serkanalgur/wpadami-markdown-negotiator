@@ -1,29 +1,46 @@
 <?php
+/**
+ * Settings for AI Markdown.
+ *
+ * @package SA_AI_Markdown
+ */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Class SA_AI_Markdown_Settings
+ *
+ * Handles the administration settings page and option registration.
+ */
 class SA_AI_Markdown_Settings {
 
+
+	/**
+	 * Constructor.
+	 */
 	public function __construct() {
-		add_action( 'admin_menu', [ $this, 'add_settings_menu' ] );
-		add_action( 'admin_init', [ $this, 'register_settings' ] );
+		add_action( 'admin_menu', array( $this, 'add_settings_menu' ) );
+		add_action( 'admin_init', array( $this, 'register_settings' ) );
 	}
 
+	/**
+	 * Register the settings menu item.
+	 */
 	public function add_settings_menu() {
 		add_options_page(
 			'AI Markdown Settings',
 			'AI Markdown',
 			'manage_options',
 			'sa-ai-markdown',
-			[ $this, 'render_settings_page' ]
+			array( $this, 'render_settings_page' )
 		);
 	}
 
 	public function register_settings() {
-		register_setting( 'sa_ai_markdown_settings', 'sa_ai_markdown_post_types', [ 'sanitize_callback' => [ $this, 'sanitize_post_types' ] ] );
-		register_setting( 'sa_ai_markdown_settings', 'sa_ai_markdown_content_signal', [ 'sanitize_callback' => 'sanitize_text_field' ] );
+		register_setting( 'sa_ai_markdown_settings', 'sa_ai_markdown_post_types', array( 'sanitize_callback' => array( $this, 'sanitize_post_types' ) ) );
+		register_setting( 'sa_ai_markdown_settings', 'sa_ai_markdown_content_signal', array( 'sanitize_callback' => 'sanitize_text_field' ) );
 
 		if ( isset( $_GET['action'] ) && $_GET['action'] === 'regenerate_markdown' && isset( $_GET['_wpnonce'] ) && wp_verify_nonce( sanitize_key( $_GET['_wpnonce'] ), 'sa_ai_markdown_regenerate' ) ) {
 			$cron = new SA_AI_Markdown_Cron();
@@ -37,7 +54,7 @@ class SA_AI_Markdown_Settings {
 	 */
 	public function sanitize_post_types( $input ) {
 		if ( ! is_array( $input ) ) {
-			return [];
+			return array();
 		}
 		return array_map( 'sanitize_key', $input );
 	}
@@ -48,27 +65,27 @@ class SA_AI_Markdown_Settings {
 			return;
 		}
 
-		$selected_types = get_option( 'sa_ai_markdown_post_types', [ 'post', 'page' ] );
+		$selected_types = get_option( 'sa_ai_markdown_post_types', array( 'post', 'page' ) );
 		$content_signal = get_option( 'sa_ai_markdown_content_signal', 'ai-train=yes, search=yes, ai-input=yes' );
-		$all_post_types = get_post_types( [ 'public' => true ], 'objects' );
+		$all_post_types = get_post_types( array( 'public' => true ), 'objects' );
 
 		?>
 		<div class="wrap">
 			<h1>AI Markdown Settings</h1>
 			<form method="post" action="options.php">
-				<?php settings_fields( 'sa_ai_markdown_settings' ); ?>
-				<?php do_settings_sections( 'sa_ai_markdown_settings' ); ?>
+		<?php settings_fields( 'sa_ai_markdown_settings' ); ?>
+		<?php do_settings_sections( 'sa_ai_markdown_settings' ); ?>
 
 				<table class="form-table">
 					<tr valign="top">
 						<th scope="row">Enabled Post Types</th>
 						<td>
-							<?php foreach ( $all_post_types as $type ) : ?>
+		<?php foreach ( $all_post_types as $type ) : ?>
 								<label>
 									<input type="checkbox" name="sa_ai_markdown_post_types[]" value="<?php echo esc_attr( $type->name ); ?>" <?php checked( in_array( $type->name, (array) $selected_types ) ); ?>>
-									<?php echo esc_html( $type->label ); ?>
+			<?php echo esc_html( $type->label ); ?>
 								</label><br>
-							<?php endforeach; ?>
+		<?php endforeach; ?>
 						</td>
 					</tr>
 					<tr valign="top">
@@ -80,7 +97,7 @@ class SA_AI_Markdown_Settings {
 					</tr>
 				</table>
 
-				<?php submit_button(); ?>
+		<?php submit_button(); ?>
 			</form>
 
 			<hr>

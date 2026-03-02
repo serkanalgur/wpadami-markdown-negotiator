@@ -1,11 +1,11 @@
 === AI Markdown Content Negotiator ===
-Contributors: serkanalgur
-Donate link: https://serkanalgur.com.tr
+Contributors: kaisercrazy
+Donate link: https://github.com/serkanalgur
 Tags: markdown, ai, content negotiation, gutenberg, caching
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.3
-Stable tag: 1.0.3
+Stable tag: 1.0.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -51,6 +51,9 @@ We use a standard heuristic of ~4 characters per token to provide an estimate in
 1. The AI Markdown settings page.
 
 == Changelog ==
+
+= 1.0.4 =
+* 
 
 = 1.0.3 =
 * Ability to generate markdown when post changes.

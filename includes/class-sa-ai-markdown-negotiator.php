@@ -1,18 +1,38 @@
 <?php
+/**
+ * Negotiator for serving Markdown content.
+ *
+ * @package SA_AI_Markdown
+ */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Class SA_AI_Markdown_Negotiator
+ *
+ * Checks Accept headers and serves Markdown content instead of HTML or JSON.
+ */
 class SA_AI_Markdown_Negotiator {
 
+
+	/**
+	 * Constructor for the Negotiator.
+	 */
 	public function __construct() {
-		add_action( 'template_redirect', [ $this, 'detect_and_serve_markdown' ], 5 );
-		add_filter( 'rest_pre_dispatch', [ $this, 'handle_rest_markdown' ], 10, 3 );
+		add_action( 'template_redirect', array( $this, 'detect_and_serve_markdown' ), 5 );
+		add_filter( 'rest_pre_dispatch', array( $this, 'handle_rest_markdown' ), 10, 3 );
 	}
 
 	/**
 	 * Handle Markdown requests via REST API.
+	 *
+	 * @param mixed           $result  Response to return.
+	 * @param WP_REST_Server  $server  REST server object.
+	 * @param WP_REST_Request $request REST request object.
+	 *
+	 * @return mixed
 	 */
 	public function handle_rest_markdown( $result, $server, $request ) {
 		$accept_header = $request->get_header( 'accept' );
@@ -42,20 +62,20 @@ class SA_AI_Markdown_Negotiator {
 			return;
 		}
 
-		$post_id = get_queried_object_id();
+		$post_id  = get_queried_object_id();
 		$markdown = get_post_meta( $post_id, SA_AI_Markdown_Cron::META_KEY_MARKDOWN, true );
-		$tokens = get_post_meta( $post_id, SA_AI_Markdown_Cron::META_KEY_TOKENS, true );
+		$tokens   = get_post_meta( $post_id, SA_AI_Markdown_Cron::META_KEY_TOKENS, true );
 
 		// If cache doesn't exist, generate it on the fly (fallback)
 		if ( empty( $markdown ) ) {
 			$generator = new SA_AI_Markdown_Generator();
-			$post = get_post( $post_id );
-			$markdown = $generator->generate_markdown( $post );
-			$tokens = SA_AI_Markdown_Generator::estimate_markdown_tokens( $markdown );
+			$post      = get_post( $post_id );
+			$markdown  = $generator->generate_markdown( $post );
+			$tokens    = SA_AI_Markdown_Generator::estimate_markdown_tokens( $markdown );
 		}
 
 		// Security: ensures no private/logged-in data leaks
-		// We could potentially use wp_logout() here if we wanted to be extreme, 
+		// We could potentially use wp_logout() here if we wanted to be extreme,
 		// but standardizing on non-logged-in context for AI agents is safer.
 		// For now, we'll just serve the content.
 
@@ -67,8 +87,7 @@ class SA_AI_Markdown_Negotiator {
 		header( 'X-Content-Signal: ' . esc_attr( $signal ) );
 		header( 'Vary: Accept' );
 
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		echo $markdown;
+		echo esc_html( $markdown );
 		exit;
 	}
 
@@ -76,10 +95,10 @@ class SA_AI_Markdown_Negotiator {
 	 * Generate dynamic X-Content-Signal header.
 	 */
 	private function get_content_signal( $post_id ) {
-		$post = get_post( $post_id );
-		$type = $post->post_type;
-		$categories = wp_get_post_categories( $post_id, [ 'fields' => 'names' ] );
-		
+		$post       = get_post( $post_id );
+		$type       = $post->post_type;
+		$categories = wp_get_post_categories( $post_id, array( 'fields' => 'names' ) );
+
 		$depth = 'general';
 		if ( in_array( 'Technical', $categories ) || in_array( 'Code', $categories ) ) {
 			$depth = 'technical';

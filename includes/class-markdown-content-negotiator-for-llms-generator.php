@@ -2,7 +2,7 @@
 /**
  * Generator for AI Markdown.
  *
- * @package WPADAMI_AI_Markdown
+ * @package Markdown_Content_Negotiator_For_LLMs
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -10,11 +10,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Class WPADAMI_AI_Markdown_Generator
+ * Class Markdown_Content_Negotiator_For_LLMs_Generator
  *
  * Converts WordPress posts to Markdown with YAML frontmatter.
  */
-class WPADAMI_AI_Markdown_Generator {
+class Markdown_Content_Negotiator_For_LLMs_Generator {
 
 	/**
 	 * Constructor.

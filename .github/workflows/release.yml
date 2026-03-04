@@ -32,13 +32,13 @@ jobs:
 
       - name: ZIP plugin
         run: |
-          mkdir wpadami-markdown-negotiator
+          mkdir markdown-content-negotiator-for-llms
           shopt -s dotglob
-          mv * wpadami-markdown-negotiator/ 2>/dev/null || true
-          zip -r "wpadami-markdown-negotiator-${{ steps.vars.outputs.tag }}.zip" wpadami-markdown-negotiator/
+          mv * markdown-content-negotiator-for-llms/ 2>/dev/null || true
+          zip -r "markdown-content-negotiator-for-llms-${{ steps.vars.outputs.tag }}.zip" markdown-content-negotiator-for-llms/
 
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "wpadami-markdown-negotiator-${{ steps.vars.outputs.tag }}.zip"
+          artifacts: "markdown-content-negotiator-for-llms-${{ steps.vars.outputs.tag }}.zip"
           token: ${{ secrets.GITHUB_TOKEN }}

@@ -2,7 +2,7 @@
 /**
  * Cron and Save handles for AI Markdown.
  *
- * @package WPADAMI_AI_Markdown
+ * @package Markdown_Content_Negotiator_For_LLMs
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -10,13 +10,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Class WPADAMI_AI_Markdown_Cron
+ * Class Markdown_Content_Negotiator_For_LLMs_Cron
  *
  * Handles background markdown regeneration and save_post triggers.
  */
-class WPADAMI_AI_Markdown_Cron {
+class Markdown_Content_Negotiator_For_LLMs_Cron {
 
-	const CRON_EVENT        = 'wpadami_markdown_regenerate_cache';
+	const CRON_EVENT        = 'markdown_content_negotitator_for_llms_regenerate_cache';
 	const META_KEY_MARKDOWN = '_wpadami_markdowncache';
 	const META_KEY_TOKENS   = '_wpadami_markdowntokens';
 	const META_KEY_MODIFIED = '_wpadami_markdownlast_modified';
@@ -49,7 +49,7 @@ class WPADAMI_AI_Markdown_Cron {
 	 * Process all published posts/pages and update their markdown cache.
 	 */
 	public function process_all_posts() {
-		$post_types = (array) get_option( 'wpadami_markdown_post_types', array( 'post', 'page' ) );
+		$post_types = (array) get_option( 'markdown_content_negotitator_for_llms_post_types', array( 'post', 'page' ) );
 
 		$args = array(
 			'post_type'      => $post_types,
@@ -65,7 +65,7 @@ class WPADAMI_AI_Markdown_Cron {
 			return;
 		}
 
-		$generator = new WPADAMI_AI_Markdown_Generator();
+		$generator = new Markdown_Content_Negotiator_For_LLMs_Generator();
 
 		foreach ( $post_ids as $post_id ) {
 			$post = get_post( $post_id );
@@ -76,7 +76,7 @@ class WPADAMI_AI_Markdown_Cron {
 			}
 
 			$markdown = $generator->generate_markdown( $post );
-			$tokens   = WPADAMI_AI_Markdown_Generator::estimate_markdown_tokens( $markdown );
+			$tokens   = Markdown_Content_Negotiator_For_LLMs_Generator::estimate_markdown_tokens( $markdown );
 
 			update_post_meta( $post_id, self::META_KEY_MARKDOWN, $markdown );
 			update_post_meta( $post_id, self::META_KEY_TOKENS, $tokens );
@@ -96,9 +96,9 @@ class WPADAMI_AI_Markdown_Cron {
 			return;
 		}
 
-		$generator = new WPADAMI_AI_Markdown_Generator();
+		$generator = new Markdown_Content_Negotiator_For_LLMs_Generator();
 		$markdown  = $generator->generate_markdown( $post );
-		$tokens    = WPADAMI_AI_Markdown_Generator::estimate_markdown_tokens( $markdown );
+		$tokens    = Markdown_Content_Negotiator_For_LLMs_Generator::estimate_markdown_tokens( $markdown );
 
 		update_post_meta( $post_id, self::META_KEY_MARKDOWN, $markdown );
 		update_post_meta( $post_id, self::META_KEY_TOKENS, $tokens );
@@ -116,7 +116,7 @@ class WPADAMI_AI_Markdown_Cron {
 			return;
 		}
 
-		$post_types = (array) get_option( 'wpadami_markdown_post_types', array( 'post', 'page' ) );
+		$post_types = (array) get_option( 'markdown_content_negotitator_for_llms_post_types', array( 'post', 'page' ) );
 		if ( ! in_array( $post->post_type, $post_types, true ) ) {
 			return;
 		}

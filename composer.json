@@ -1,13 +1,13 @@
 {
-    "name": "serkanalgur/wpadami-markdown-negotiator",
+    "name": "serkanalgur/markdown-content-negotiator-for-llms",
     "description": "Detects Accept: text/markdown and serves pre-generated Markdown versions of posts/pages for AI agents.",
     "type": "wordpress-plugin",
     "license": "GPL-2.0-or-later",
     "authors": [
         {
             "name": "Serkan Algur",
-            "email": "serkan@algur.com.tr",
-            "homepage": "https://serkanalgur.com.tr"
+            "email": "info@wpadami.com",
+            "homepage": "https://github.com/serkanalgur"
         }
     ],
     "require": {

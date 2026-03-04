@@ -2,7 +2,7 @@
 /**
  * Negotiator for serving Markdown content.
  *
- * @package WPADAMI_AI_Markdown
+ * @package Markdown_Content_Negotiator_For_LLMs
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -10,12 +10,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Class WPADAMI_AI_Markdown_Negotiator
+ * Class Markdown_Content_Negotiator_For_LLMs_Negotiator
  *
  * Checks Accept headers and serves Markdown content instead of HTML or JSON.
  */
-class WPADAMI_AI_Markdown_Negotiator {
-
+class Markdown_Content_Negotiator_For_LLMs_Negotiator {
 
 	/**
 	 * Constructor for the Negotiator.
@@ -58,14 +57,14 @@ class WPADAMI_AI_Markdown_Negotiator {
 		}
 
 		$post_id  = get_queried_object_id();
-		$markdown = get_post_meta( $post_id, WPADAMI_AI_Markdown_Cron::META_KEY_MARKDOWN, true );
-		$tokens   = get_post_meta( $post_id, WPADAMI_AI_Markdown_Cron::META_KEY_TOKENS, true );
+		$markdown = get_post_meta( $post_id, Markdown_Content_Negotiator_For_LLMs_Cron::META_KEY_MARKDOWN, true );
+		$tokens   = get_post_meta( $post_id, Markdown_Content_Negotiator_For_LLMs_Cron::META_KEY_TOKENS, true );
 
 		if ( empty( $markdown ) ) {
-			$generator = new WPADAMI_AI_Markdown_Generator();
+			$generator = new Markdown_Content_Negotiator_For_LLMs_Generator();
 			$post      = get_post( $post_id );
 			$markdown  = $generator->generate_markdown( $post );
-			$tokens    = WPADAMI_AI_Markdown_Generator::estimate_markdown_tokens( $markdown );
+			$tokens    = Markdown_Content_Negotiator_For_LLMs_Generator::estimate_markdown_tokens( $markdown );
 		}
 
 		$signal = $this->get_content_signal( $post_id );
@@ -101,7 +100,7 @@ class WPADAMI_AI_Markdown_Negotiator {
 
 		$signal = "type={$type}, depth={$depth}, priority={$priority}";
 
-		$extra_signal = get_option( 'wpadami_markdown_content_signal', 'ai-train=yes, search=yes, ai-input=yes' );
+		$extra_signal = get_option( 'markdown_content_negotitator_for_llms_content_signal', 'ai-train=yes, search=yes, ai-input=yes' );
 		if ( ! empty( $extra_signal ) ) {
 			$signal .= ', ' . $extra_signal;
 		}

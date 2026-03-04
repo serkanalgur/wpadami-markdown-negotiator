@@ -1,8 +1,7 @@
-[![WordPress](https://img.shields.io/badge/WordPress-%2321759B.svg?logo=wordpress&logoColor=white)](#) ![Packagist Version](https://img.shields.io/packagist/v/serkanalgur/wpadami-markdown-negotiator) [![PHP](https://img.shields.io/badge/php-%23777BB4.svg?&logo=php&logoColor=white)](#) ![GitHub Release](https://img.shields.io/github/v/release/serkanalgur/wpadami-markdown-negotiator) ![GitHub License](https://img.shields.io/github/license/serkanalgur/wpadami-markdown-negotiator)
-
+[![WordPress](https://img.shields.io/badge/WordPress-%2321759B.svg?logo=wordpress&logoColor=white)](#) ![Packagist Version](https://img.shields.io/packagist/v/serkanalgur/markdown-content-negotitator-for-llms) [![PHP](https://img.shields.io/badge/php-%23777BB4.svg?&logo=php&logoColor=white)](#) ![GitHub Release](https://img.shields.io/github/v/release/serkanalgur/markdown-content-negotitator-for-llms) ![GitHub License](https://img.shields.io/github/license/serkanalgur/markdown-content-negotitator-for-llms)
 
 ![Logo](assets/icon-256.png)
-## Wpadami Markdown Content Negotiator for LLMs
+## Markdown Content Negotiator for LLMs
 
 A WordPress plugin that detects when a request is made for content in Markdown format (via the `Accept: text/markdown` header) and serves a clean, pre-generated Markdown version of the page instead of HTML.
 
@@ -61,6 +60,9 @@ Available under **Settings > AI Markdown**:
 ![Settings Page Screenshot](screenshot.png)
 
 ## Changelog
+
+### 1.0.6
+* Refacotr avoid trademark of 'WP'
 
 ### 1.0.5 
 * Name Change & Refactor plugin

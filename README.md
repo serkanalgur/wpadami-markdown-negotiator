@@ -61,8 +61,8 @@ Available under **Settings > AI Markdown**:
 
 ## Changelog
 
-### 1.0.6
-* Refacotr avoid trademark of 'WP'
+### 1.0.7
+* Refactor avoid trademark of 'WP'
 
 ### 1.0.5 
 * Name Change & Refactor plugin

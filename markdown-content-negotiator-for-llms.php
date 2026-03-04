@@ -37,13 +37,13 @@ require_once MARKDOWN_CONTENT_NEGOTIATOR_PATH . 'includes/class-markdown-content
 /**
  * Initialize the plugin
  */
-function wpadami_ai_markdown_init() {
+function Markdown_Content_Negotiator_init() {
 	new Markdown_Content_Negotiator_For_LLMs_Generator();
 	new Markdown_Content_Negotiator_For_LLMs_Cron();
 	new Markdown_Content_Negotiator_For_LLMs_Negotiator();
 	new Markdown_Content_Negotiator_For_LLMs_Settings();
 }
-add_action( 'plugins_loaded', 'wpadami_ai_markdown_init' );
+add_action( 'plugins_loaded', 'Markdown_Content_Negotiator_init' );
 
 /**
  * Activation hook

@@ -61,6 +61,9 @@ Available under **Settings > AI Markdown**:
 
 ## Changelog
 
+### 1.0.8
+* Misspelling fix
+
 ### 1.0.7
 * Refactor avoid trademark of 'WP'
 

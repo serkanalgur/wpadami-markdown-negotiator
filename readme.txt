@@ -5,7 +5,7 @@ Tags: markdown, ai, content negotiation, gutenberg, caching
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.3
-Stable tag: 1.0.7
+Stable tag: 1.0.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -51,6 +51,9 @@ We use a standard heuristic of ~4 characters per token to provide an estimate in
 1. The AI Markdown settings page.
 
 == Changelog ==
+
+= 1.0.8 =
+* Misspelling fix
 
 = 1.0.7 =
 * Refactor avoid trademark of 'WP'

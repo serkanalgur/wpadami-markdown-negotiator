@@ -3,7 +3,7 @@
  * Plugin Name:       Wpadami Markdown Content Negotiator for LLMs
  * Plugin URI:        https://github.com/serkanalgur/wpadami-markdown-negotiator
  * Description:       Detects Accept: text/markdown and serves pre-generated Markdown versions of posts/pages.
- * Version:           1.0.4
+ * Version:           1.0.5
  * Requires at least: 6.0
  * Tested up to:      6.9
  * Requires PHP:      7.3
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Define constants
  */
-define( 'WPADAMI_AI_MARKDOWN_VERSION', '1.0.4' );
+define( 'WPADAMI_AI_MARKDOWN_VERSION', '1.0.5' );
 define( 'WPADAMI_AI_MARKDOWN_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WPADAMI_AI_MARKDOWN_URL', plugin_dir_url( __FILE__ ) );
 

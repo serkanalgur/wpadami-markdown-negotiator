@@ -111,6 +111,12 @@ class Markdown_Content_Negotiator_For_LLMs_Generator {
 		}
 
 		$content = $post->post_content;
+
+		// Support for Elementor content.
+		if ( did_action( 'elementor/loaded' ) && \Elementor\Plugin::$instance->db->is_built_with_elementor( $post->ID ) ) {
+			$content = \Elementor\Plugin::$instance->frontend->get_builder_content( $post->ID );
+		}
+
 		if ( has_blocks( $content ) ) {
 			$markdown .= $this->convert_blocks_to_markdown( $content );
 		} else {
@@ -252,7 +258,7 @@ class Markdown_Content_Negotiator_For_LLMs_Generator {
 	}
 
 	/**
-	 * Generate Markdown for a WooCommerce product using the template.
+	 * Generate Markdown for a WooCommerce product using an internal template.
 	 *
 	 * @param WP_Post $post The product post object.
 	 * @return string The Markdown content.
@@ -263,17 +269,16 @@ class Markdown_Content_Negotiator_For_LLMs_Generator {
 			return '';
 		}
 
-		$template_path = plugin_dir_path( __DIR__ ) . 'markdown-templates/product-template.md';
-		if ( ! file_exists( $template_path ) ) {
-			return '';
+		// Prepare data for replacement.
+		$product_name      = $product->get_name();
+		$description       = $product->get_description();
+		$short_description = $product->get_short_description();
+
+		// Handle Elementor content for product description if exists.
+		if ( did_action( 'elementor/loaded' ) && \Elementor\Plugin::$instance->db->is_built_with_elementor( $post->ID ) ) {
+			$description = \Elementor\Plugin::$instance->frontend->get_builder_content( $post->ID );
 		}
 
-		$template = file_get_contents( $template_path );
-
-		// Prepare data for replacement.
-		$product_name        = $product->get_name();
-		$description         = $product->get_description();
-		$short_description   = $product->get_short_description();
 		$price               = $product->get_price();
 		$currency            = get_woocommerce_currency_symbol();
 		$availability        = $product->is_in_stock() ? 'In Stock' : 'Out of Stock';
@@ -291,41 +296,65 @@ class Markdown_Content_Negotiator_For_LLMs_Generator {
 				if ( $attribute->is_taxonomy() ) {
 					$terms = $attribute->get_terms();
 					$values = array();
-					foreach ( $terms as $term ) {
-						$values[] = $term->name;
+					if ( ! is_wp_error( $terms ) && ! empty( $terms ) ) {
+						foreach ( $terms as $term ) {
+							$values[] = $term->name;
+						}
 					}
 					$value = implode( ', ', $values );
 				} else {
-					$value = $attribute->get_options()[0];
+					$options = $attribute->get_options();
+					$value   = ! empty( $options ) ? $options[0] : '';
 				}
-				$features_output .= "*   **$name:** $value\n";
+				if ( $value ) {
+					$features_output .= "*   **$name:** $value\n";
+				}
 			}
+		}
+
+		if ( empty( $features_output ) ) {
+			$features_output = 'No specific features listed.';
 		}
 
 		// Specifications table.
 		$specs_table  = "| Specification | Detail |\n";
 		$specs_table .= "| :--- | :--- |\n";
-		$specs_table .= "| **Dimensions** | " . $product->get_dimensions( false ) . " |\n";
-		$specs_table .= "| **Weight** | " . $product->get_weight() . " " . get_option( 'woocommerce_weight_unit' ) . " |\n";
-		$specs_table .= "| **SKU** | " . $product->get_sku() . " |\n";
+		
+		$dimensions = $product->get_dimensions( false );
+		$dim_string = 'N/A';
+		if ( is_array( $dimensions ) ) {
+			$dim_string = implode( ' x ', array_filter( $dimensions ) );
+		} elseif ( is_string( $dimensions ) ) {
+			$dim_string = $dimensions;
+		}
+		
+		$specs_table .= "| **Dimensions** | " . ( ! empty( $dim_string ) ? $dim_string : 'N/A' ) . " |\n";
+		$weight       = $product->get_weight();
+		$specs_table .= "| **Weight** | " . ( ! empty( $weight ) ? $weight . ' ' . get_option( 'woocommerce_weight_unit' ) : 'N/A' ) . " |\n";
+		$specs_table .= "| **SKU** | " . ( $product->get_sku() ?: 'N/A' ) . " |\n";
 
-		// Combine content.
-		$replacements = array(
-			'[Product Name]'                       => $product_name,
-			'A brief, compelling overview of the product. Focus on its purpose and primary benefit to the user. This section should be no more than a couple of paragraphs.' => $short_description ? wp_strip_all_tags( $short_description ) : wp_strip_all_tags( $description ),
-			"*   **Feature 1:** A short explanation of what this feature does.\n*   **Feature 2:** Detail the benefit of the feature.\n*   **Feature 3:** Mention any specific technical aspect or user value." => trim( $features_output ) ?: 'No specific features listed.',
-			"| Specification | Detail |\n| :--- | :--- |\n| **Dimensions** | X\" x Y\" x Z\" |\n| **Weight** | W lbs |\n| **Material** | Type of material |\n| **Color(s)** | Available colors |" => trim( $specs_table ),
-			'$XX.XX'                               => $price . ' ' . $currency,
-			'[In Stock / Out of Stock]'            => $availability,
-			'https://example.com'                  => $permalink,
-			'![Product Image Alt Text](https://example.com)' => "![$thumbnail_alt]($thumbnail_url)",
-		);
+		// Construct Markdown directly.
+		$markdown  = "# $product_name\n\n";
+		$markdown .= "## Description\n";
+		$markdown .= ( $short_description ? wp_strip_all_tags( $short_description ) : wp_strip_all_tags( $this->convert_html_to_markdown( $description ) ) ) . "\n\n";
+		
+		$markdown .= "## Key Features\n";
+		$markdown .= trim( $features_output ) . "\n\n";
 
-		foreach ( $replacements as $placeholder => $value ) {
-			$template = str_replace( $placeholder, $value, $template );
+		$markdown .= "## Specifications\n";
+		$markdown .= trim( $specs_table ) . "\n\n";
+
+		$markdown .= "## Pricing & Availability\n";
+		$markdown .= "*   **Price:** " . wp_strip_all_tags( wc_price( $price ) ) . "\n";
+		$markdown .= "*   **Availability:** $availability\n";
+		$markdown .= "*   [Purchase Link]($permalink)\n\n";
+
+		if ( $thumbnail_url ) {
+			$markdown .= "## Image\n";
+			$markdown .= "![" . $this->quote( $thumbnail_alt ) . "]($thumbnail_url)\n";
 		}
 
-		return trim( $template );
+		return trim( $markdown );
 	}
 
 	/**

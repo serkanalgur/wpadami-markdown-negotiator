@@ -5,7 +5,7 @@ Tags: markdown, ai, content negotiation, gutenberg, caching, woocommerce
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.3
-Stable tag: 1.0.9
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -52,12 +52,14 @@ We use a standard heuristic of ~4 characters per token to provide an estimate in
 
 == Changelog ==
 
-= 1.0.9 =
-* Support for WooCommerce Products.
-* Added product-specific Markdown templates.
-* Better metadata extraction for e-commerce sites.
+= 1.1.0 =
+* Added WooCommerce Product support.
+* Added Elementor content rendering support.
+* Improved WooCommerce product data extraction (dimensions, weight, price with currency).
+* Moved product templates to internal code-based generation.
+* Fixed Markdown output escaping issues.
 
-= 1.0.8 =
+= 1.0.9 =
 * Misspelling fix
 
 = 1.0.7 =

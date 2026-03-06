@@ -62,6 +62,13 @@ Available under **Settings > AI Markdown**:
 
 ## Changelog
 
+### 1.1.0
+* Added WooCommerce Product support.
+* Added Elementor content rendering support.
+* Improved WooCommerce product data extraction (dimensions, weight, price with currency).
+* Moved product templates to internal code-based generation.
+* Fixed Markdown output escaping issues.
+
 ### 1.0.9
 * Support for WooCommerce Products.
 * Added product-specific Markdown templates.

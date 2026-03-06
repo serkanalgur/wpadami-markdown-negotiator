@@ -74,7 +74,7 @@ class Markdown_Content_Negotiator_For_LLMs_Negotiator {
 		header( 'X-Content-Signal: ' . esc_attr( $signal ) );
 		header( 'Vary: Accept' );
 
-		echo esc_html( $markdown );
+		echo $markdown; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- This is pre-generated Markdown content.
 		exit;
 	}
 

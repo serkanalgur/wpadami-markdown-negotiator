@@ -1,11 +1,11 @@
 === Markdown Content Negotiator for LLMs ===
 Contributors: kaisercrazy
 Donate link: https://github.com/serkanalgur
-Tags: markdown, ai, content negotiation, gutenberg, caching
+Tags: markdown, ai, content negotiation, gutenberg, caching, woocommerce
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.3
-Stable tag: 1.0.8
+Stable tag: 1.0.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -51,6 +51,11 @@ We use a standard heuristic of ~4 characters per token to provide an estimate in
 1. The AI Markdown settings page.
 
 == Changelog ==
+
+= 1.0.9 =
+* Support for WooCommerce Products.
+* Added product-specific Markdown templates.
+* Better metadata extraction for e-commerce sites.
 
 = 1.0.8 =
 * Misspelling fix

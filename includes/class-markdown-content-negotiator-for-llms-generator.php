@@ -34,6 +34,11 @@ class Markdown_Content_Negotiator_For_LLMs_Generator {
 			return '';
 		}
 
+		// Handle WooCommerce Products specifically.
+		if ( 'product' === $post->post_type && class_exists( 'WooCommerce' ) ) {
+			return $this->generate_product_markdown( $post );
+		}
+
 		$frontmatter = array(
 			'title'      => $post->post_title,
 			'date'       => $post->post_date,
@@ -244,6 +249,83 @@ class Markdown_Content_Negotiator_For_LLMs_Generator {
 		}
 
 		return $markdown;
+	}
+
+	/**
+	 * Generate Markdown for a WooCommerce product using the template.
+	 *
+	 * @param WP_Post $post The product post object.
+	 * @return string The Markdown content.
+	 */
+	private function generate_product_markdown( $post ) {
+		$product = wc_get_product( $post->ID );
+		if ( ! $product ) {
+			return '';
+		}
+
+		$template_path = plugin_dir_path( __DIR__ ) . 'markdown-templates/product-template.md';
+		if ( ! file_exists( $template_path ) ) {
+			return '';
+		}
+
+		$template = file_get_contents( $template_path );
+
+		// Prepare data for replacement.
+		$product_name        = $product->get_name();
+		$description         = $product->get_description();
+		$short_description   = $product->get_short_description();
+		$price               = $product->get_price();
+		$currency            = get_woocommerce_currency_symbol();
+		$availability        = $product->is_in_stock() ? 'In Stock' : 'Out of Stock';
+		$permalink           = get_permalink( $post->ID );
+		$thumbnail_id        = $product->get_image_id();
+		$thumbnail_url       = $thumbnail_id ? wp_get_attachment_url( $thumbnail_id ) : '';
+		$thumbnail_alt       = $thumbnail_id ? get_post_meta( $thumbnail_id, '_wp_attachment_image_alt', true ) : '';
+
+		// Features (could be attributes or from the main description).
+		$features_output = '';
+		$attributes      = $product->get_attributes();
+		if ( ! empty( $attributes ) ) {
+			foreach ( $attributes as $attribute ) {
+				$name = wc_attribute_label( $attribute->get_name() );
+				if ( $attribute->is_taxonomy() ) {
+					$terms = $attribute->get_terms();
+					$values = array();
+					foreach ( $terms as $term ) {
+						$values[] = $term->name;
+					}
+					$value = implode( ', ', $values );
+				} else {
+					$value = $attribute->get_options()[0];
+				}
+				$features_output .= "*   **$name:** $value\n";
+			}
+		}
+
+		// Specifications table.
+		$specs_table  = "| Specification | Detail |\n";
+		$specs_table .= "| :--- | :--- |\n";
+		$specs_table .= "| **Dimensions** | " . $product->get_dimensions( false ) . " |\n";
+		$specs_table .= "| **Weight** | " . $product->get_weight() . " " . get_option( 'woocommerce_weight_unit' ) . " |\n";
+		$specs_table .= "| **SKU** | " . $product->get_sku() . " |\n";
+
+		// Combine content.
+		$replacements = array(
+			'[Product Name]'                       => $product_name,
+			'A brief, compelling overview of the product. Focus on its purpose and primary benefit to the user. This section should be no more than a couple of paragraphs.' => $short_description ? wp_strip_all_tags( $short_description ) : wp_strip_all_tags( $description ),
+			"*   **Feature 1:** A short explanation of what this feature does.\n*   **Feature 2:** Detail the benefit of the feature.\n*   **Feature 3:** Mention any specific technical aspect or user value." => trim( $features_output ) ?: 'No specific features listed.',
+			"| Specification | Detail |\n| :--- | :--- |\n| **Dimensions** | X\" x Y\" x Z\" |\n| **Weight** | W lbs |\n| **Material** | Type of material |\n| **Color(s)** | Available colors |" => trim( $specs_table ),
+			'$XX.XX'                               => $price . ' ' . $currency,
+			'[In Stock / Out of Stock]'            => $availability,
+			'https://example.com'                  => $permalink,
+			'![Product Image Alt Text](https://example.com)' => "![$thumbnail_alt]($thumbnail_url)",
+		);
+
+		foreach ( $replacements as $placeholder => $value ) {
+			$template = str_replace( $placeholder, $value, $template );
+		}
+
+		return trim( $template );
 	}
 
 	/**

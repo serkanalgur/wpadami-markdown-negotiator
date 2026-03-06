@@ -1,7 +1,7 @@
 [![WordPress](https://img.shields.io/badge/WordPress-%2321759B.svg?logo=wordpress&logoColor=white)](https://wordpress.org/plugins/sa-ai-markdown/) [![Packagist Version](https://img.shields.io/packagist/v/serkanalgur/markdown-content-negotiator-for-llms)](https://packagist.org/packages/serkanalgur/markdown-content-negotiator-for-llms) ![WordPress Plugin Version](https://img.shields.io/wordpress/plugin/v/sa-ai-markdown) [![WordPress Plugin Stars](https://img.shields.io/wordpress/plugin/stars/sa-ai-markdown)](https://wordpress.org/plugins/sa-ai-markdown/#reviews) [![PHP](https://img.shields.io/badge/php-%23777BB4.svg?&logo=php&logoColor=white)](#) [![GitHub Release](https://img.shields.io/github/v/release/serkanalgur/markdown-content-negotiator-for-llms)](https://github.com/serkanalgur/markdown-content-negotiator-for-llms/releases) ![WordPress Plugin Downloads](https://img.shields.io/wordpress/plugin/dw/sa-ai-markdown)
 
 
-![Logo](assets/icon-256.png)
+![Logo](assets/icon-256x256.png)
 ## Markdown Content Negotiator for LLMs
 
 A WordPress plugin that detects when a request is made for content in Markdown format (via the `Accept: text/markdown` header) and serves a clean, pre-generated Markdown version of the page instead of HTML.
@@ -61,6 +61,11 @@ Available under **Settings > AI Markdown**:
 ![Settings Page Screenshot](screenshot.png)
 
 ## Changelog
+
+### 1.0.9
+* Support for WooCommerce Products.
+* Added product-specific Markdown templates.
+* Better metadata extraction for e-commerce sites.
 
 ### 1.0.8
 * Misspelling fix

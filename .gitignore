@@ -35,6 +35,7 @@ composer.lock
 # Environment files
 .env
 .htaccess 
+markdown-templates/
 
 # Any other specific files generated locally that shouldn't be committed
 # Example: a local configuration file

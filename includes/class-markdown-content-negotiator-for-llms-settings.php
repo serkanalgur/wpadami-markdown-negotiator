@@ -75,43 +75,56 @@ class Markdown_Content_Negotiator_For_LLMs_Settings {
 		$content_signal = get_option( 'markdown_content_negotitator_for_llms_content_signal', 'ai-train=yes, search=yes, ai-input=yes' );
 		$all_post_types = get_post_types( array( 'public' => true ), 'objects' );
 
+		// Check if WooCommerce is active.
+		$is_woocommerce_active = class_exists( 'WooCommerce' );
 		?>
-		<div class="wrap">
-			<h1>Markdown Content Negotiator Settings</h1>
-			<form method="post" action="options.php">
-		<?php settings_fields( 'markdown_content_negotitator_for_llms_settings' ); ?>
-		<?php do_settings_sections( 'markdown_content_negotitator_for_llms_settings' ); ?>
+<div class="wrap">
+    <h1>Markdown Content Negotiator Settings</h1>
+    <form method="post" action="options.php">
+        <?php settings_fields( 'markdown_content_negotitator_for_llms_settings' ); ?>
+        <?php do_settings_sections( 'markdown_content_negotitator_for_llms_settings' ); ?>
 
-				<table class="form-table">
-					<tr valign="top">
-						<th scope="row">Enabled Post Types</th>
-						<td>
-				<?php foreach ( $all_post_types as $type ) : ?>
-							<label>
-								<input type="checkbox" name="markdown_content_negotitator_for_llms_post_types[]" value="<?php echo esc_attr( $type->name ); ?>" <?php checked( in_array( $type->name, (array) $selected_types, true ) ); ?>>
-							<?php echo esc_html( $type->label ); ?>
-							</label><br>
-				<?php endforeach; ?>
-						</td>
-					</tr>
-					<tr valign="top">
-						<th scope="row">X-Content-Signal Extra</th>
-						<td>
-							<input type="text" name="markdown_content_negotitator_for_llms_content_signal" value="<?php echo esc_attr( $content_signal ); ?>" class="regular-text">
-							<p class="description">Additional signals to append to the X-Content-Signal header (e.g., <code>ai-train=yes, search=yes, ai-input=yes</code>).</p>
-						</td>
-					</tr>
-				</table>
+        <table class="form-table">
+            <tr valign="top">
+                <th scope="row">Enabled Post Types</th>
+                <td>
+                    <?php
+				foreach ( $all_post_types as $type ) :
+					// If this is a product and WooCommerce is NOT active, skip it.
+					if ( 'product' === $type->name && ! $is_woocommerce_active ) {
+						continue;
+					}
+					?>
+                    <label>
+                        <input type="checkbox" name="markdown_content_negotitator_for_llms_post_types[]"
+                            value="<?php echo esc_attr( $type->name ); ?>"
+                            <?php checked( in_array( $type->name, (array) $selected_types, true ) ); ?>>
+                        <?php echo esc_html( $type->label ); ?>
+                    </label><br>
+                    <?php endforeach; ?>
+                </td>
+            </tr>
+            <tr valign="top">
+                <th scope="row">X-Content-Signal Extra</th>
+                <td>
+                    <input type="text" name="markdown_content_negotitator_for_llms_content_signal"
+                        value="<?php echo esc_attr( $content_signal ); ?>" class="regular-text">
+                    <p class="description">Additional signals to append to the X-Content-Signal header (e.g.,
+                        <code>ai-train=yes, search=yes, ai-input=yes</code>).</p>
+                </td>
+            </tr>
+        </table>
 
-		<?php submit_button(); ?>
-			</form>
+        <?php submit_button(); ?>
+    </form>
 
-			<hr>
+    <hr>
 
-			<h2>Manual Actions</h2>
-			<p>Click below to manually trigger the Markdown cache regeneration for all selected post types.</p>
-			<a href="<?php echo esc_url( wp_nonce_url( admin_url( 'options-general.php?page=markdown-content-negotiator-for-llms&action=regenerate_markdown' ), 'markdown_content_negotitator_for_llms_regenerate' ) ); ?>" class="button button-secondary">Regenerate Markdown Cache Now</a>
-		</div>
-		<?php
+    <h2>Manual Actions</h2>
+    <p>Click below to manually trigger the Markdown cache regeneration for all selected post types.</p>
+    <a href="<?php echo esc_url( wp_nonce_url( admin_url( 'options-general.php?page=markdown-content-negotiator-for-llms&action=regenerate_markdown' ), 'markdown_content_negotitator_for_llms_regenerate' ) ); ?>"
+        class="button button-secondary">Regenerate Markdown Cache Now</a>
+</div>
+<?php
 	}
 }

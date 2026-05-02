@@ -62,6 +62,9 @@ Available under **Settings > AI Markdown**:
 
 ## Changelog
 
+### 1.1.1
+* Added W3 Total Cache support.
+
 ### 1.1.0
 * Added WooCommerce Product support.
 * Added Elementor content rendering support.
